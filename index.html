@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>music library</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        #btn_to_show_img {
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>買ったCDをビジュアル的に管理したい</h1>
+    <div>
+        <input type="text" name="" id="artist_name">
+        <input type="file" name="" id="image_file">
+        <button id="btn_to_show_img">Show</button>        
+    </div>
+    <hr>
+    <!-- <img id='result' alt=""> -->
+    <div id="list"></div>
+    <script>
+        const ImgFile = document.getElementById('image_file');
+        const BtnShow = document.getElementById('btn_to_show_img');
+        const artist_name = document.getElementById('artist_name');
+
+        // 組み立てたノードを一時的にストックするための容器
+        const frag = document.createDocumentFragment();
+
+        BtnShow.addEventListener('click', (res) => {
+            // console.table(ImgFile.files);
+
+
+            const p_tag = document.createElement('p');
+            const text = document.createTextNode(artist_name.value);
+            p_tag.appendChild(text);
+            // つくったpタグやテキストをDocumentFramgmentオブジェクトに突っ込む
+            frag.appendChild(p_tag);
+            list.appendChild(frag);
+
+            // FileReaderオブジェクトを使う
+            const input = ImgFile.files[0];
+            const reader = new FileReader();
+
+            console.table(reader);
+            reader.addEventListener('load', (e) => {
+                // document.getElementById('result').src = reader.result;
+
+                // imgタグを作成する
+                const img_anchor = document.createElement('img');
+                img_anchor.src = reader.result;
+                const list = document.getElementById('list');
+                list.appendChild(img_anchor);
+            }, true);
+
+            // エラーハンドリング
+            reader.addEventListener('error', () => {
+                console.error(reader.error.message);
+            }, true);
+            reader.readAsDataURL(input);
+            // 画像を表示させるごとにvalueを初期化する
+            ImgFile.value = "";
+        }, true);
+
+        
+    </script>
+</body>
+</html>
