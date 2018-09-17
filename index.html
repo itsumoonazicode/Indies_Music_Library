@@ -6,8 +6,19 @@
     <title>music library</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        #btn_to_show_img {
-            padding: 20px;
+        body {
+            margin: 0;
+        }
+        img.disabled {
+            filter: blur(4px);
+        }
+        /* フッター部分 */
+        footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #ccc;
+            text-align: center;
         }
     </style>
 </head>
@@ -16,10 +27,14 @@
     <div>
         <input type="text" name="" id="artist_name">
         <input type="file" name="" id="image_file">
-        <button id="btn_to_show_img">Show</button>        
     </div>
     <hr>
     <div id="list"></div>
+    <footer>
+        <p>
+            <button id="btn_to_show_img">post</button>
+        </p>
+    </footer>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const ImgFile = document.getElementById('image_file');
@@ -57,10 +72,10 @@
                     list.addEventListener('click', (e) => {
                         const img = e.target;
                         if(img.tagName === 'IMG') {
-                            if(img.classList.contains('highlight')) {
-                                img.classList.remove('highlight');
+                            if(img.classList.contains('disabled')) {
+                                img.classList.remove('disabled');
                             } else {
-                                img.classList.add('highlight');
+                                img.classList.add('disabled');
                             }
                         }
                     }, false);
