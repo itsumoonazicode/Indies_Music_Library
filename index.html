@@ -9,6 +9,17 @@
         body {
             margin: 0;
         }
+        #labelFile {
+            background: #000;
+            color: #ccc;
+            cursor: pointer;
+            padding: 15px 30px;
+            margin: 0 10px 20px 0;
+            display: inline-block;
+        }
+        #labelFile input {
+            display: none;
+        }
         img.disabled {
             filter: blur(4px);
         }
@@ -24,74 +35,38 @@
 </head>
 <body>
     <h1>買ったCDをビジュアル的に管理したい</h1>
-    <div>
-        <input type="text" name="" id="artist_name">
-        <input type="file" name="" id="image_file">
-    </div>
-    <hr>
+    <label for="files" id="labelFile">
+        ファイルを選択
+        <input type="file" name="files[]" id="files" multiple>
+    </label>
     <div id="list"></div>
-    <footer>
-        <p>
-            <button id="btn_to_show_img">post</button>
-        </p>
-    </footer>
+
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const ImgFile = document.getElementById('image_file');
-            const BtnShow = document.getElementById('btn_to_show_img');
-            const artist_name = document.getElementById('artist_name');
-            const list = document.getElementById('list');
+        function handleFileSelect(evt) {
+            const files = evt.target.files;
 
-            // 組み立てたノードを一時的にストックするための容器
-            const frag = document.createDocumentFragment();
+            for(let i = 0, f; f = files[i]; i++) {
+                if(!f.type.match('image.*')) {
+                    continue;
+                }
 
-            BtnShow.addEventListener('click', (res) => {
-
-                const p_tag = document.createElement('p');
-                const text = document.createTextNode(artist_name.value);
-                p_tag.appendChild(text);
-                // つくったpタグやテキストをDocumentFramgmentオブジェクトに突っ込む
-                frag.appendChild(p_tag);
-
-                list.appendChild(frag);
-
-                // FileReaderオブジェクトを使う
-                const input = ImgFile.files[0];
                 const reader = new FileReader();
 
-                // console.table(reader);
-                reader.addEventListener('load', (e) => {
+                reader.onload = (function(theFile) {
+                    return (e) => {
+                        const span = document.createElement('span');
+                        span.innerHTML = ['<img class="thumb" src="', e.target.result, '" title="', escape(theFile.name),'">'].join('');
+                        document.getElementById('list').insertBefore(span, null);
+                    };
+                })(f);
 
-                    // imgタグを作成する
-                    const img_anchor = document.createElement('img');
-                    // img_anchor.classList.add('highlight');
-                    img_anchor.src = reader.result;
-                    list.appendChild(img_anchor);
+                reader.readAsDataURL(f);
+            }
+        }
+        document.getElementById('files').addEventListener('change', handleFileSelect, false);
 
-                    // クリックした画像にクラスをつけたり外したり
-                    list.addEventListener('click', (e) => {
-                        const img = e.target;
-                        if(img.tagName === 'IMG') {
-                            if(img.classList.contains('disabled')) {
-                                img.classList.remove('disabled');
-                            } else {
-                                img.classList.add('disabled');
-                            }
-                        }
-                    }, false);
-                }, false);
 
-                // エラーハンドリング
-                reader.addEventListener('error', () => {
-                    console.error(reader.error.message);
-                }, true);
-                reader.readAsDataURL(input);
-                // 画像を表示させるごとにvalueを初期化する
-                ImgFile.value = "";
-            }, false);
 
-        }, false);
-        
     </script>
 </body>
 </html>
