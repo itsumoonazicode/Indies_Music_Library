@@ -24,7 +24,7 @@
             filter: blur(4px);
         }
         /* フッター部分 */
-        footer {
+        .footer {
             position: fixed;
             bottom: 0;
             width: 100%;
@@ -35,13 +35,37 @@
 </head>
 <body>
     <h1>買ったCDをビジュアル的に管理したい</h1>
-    <label for="files" id="labelFile">
+    <label for="files" id="labelFile" class="footer">
         ファイルを選択
         <input type="file" name="files[]" id="files" multiple>
     </label>
     <div id="list"></div>
+    <button id="btnDel">ストレージの削除</button>
 
     <script>
+        const lists = document.getElementById('list');
+        const storage = localStorage;
+        const deleteStorage = document.getElementById('btnDel');
+        if(storage) {
+            for(let a = 0, len = storage.length; a < len; a++) {
+                // get key and value
+                let b = storage.key(a);
+                let c = storage[b];
+
+                // 画像の構築
+                let items = document.createElement('img');
+                items.src = c;
+                lists.appendChild(items);
+                console.log('キャッシュされたイメージを使いました！');
+            }
+
+        }
+        // ローカルストレージ内のデータを全破棄
+        deleteStorage.addEventListener('click', () => {
+            storage.clear();
+            location.reload();
+            console.log('全破棄しました。');
+        });
         function handleFileSelect(evt) {
             const files = evt.target.files;
 
@@ -54,6 +78,12 @@
 
                 reader.onload = (function(theFile) {
                     return (e) => {
+                        // localStorageへのキャッシュ
+                        if(!storage[`${i}item`]) {
+                            storage[`${i}item`] = e.target.result;
+                            console.log('キャッシュしました！');
+                        }
+
                         const span = document.createElement('span');
                         span.innerHTML = ['<img class="thumb" src="', e.target.result, '" title="', escape(theFile.name),'">'].join('');
                         document.getElementById('list').insertBefore(span, null);
