@@ -43,18 +43,49 @@
     <button id="btnDel">ストレージの削除</button>
 
     <script>
+        // /*
+        //  *クラス作成
+        // */
+        // ストレージ用オブジェクト変換のクラス
+        const MyStorage = function(app) {
+            // アプリ名
+            this.app = app;
+            // 利用するストレージの種類
+            this.storage = localStorage;
+            // ストレージから読み込んだオブジェクト
+            // 該当するデータがない場合、空のオブジェクトを生成
+            this.data = JSON.parse(this.storage[this.app] || '{}');
+        };
+        MyStorage.prototype = {
+            // 指定されたキーで値を取得
+            getItem: function(key){
+                return this.data[key];
+            },
+            // 指定されたキー / 値でオブジェクトを書き換え
+            setItem: function(key, value){
+                this.data[key] = value;
+            },
+            // MyStorageオブジェクトの内容をストレージに保存
+            save: function(){
+                this.storage[this.app] = JSON.stringify(this.data);
+            },
+            destroy: function(){
+                this.storage.clear();
+            }
+        };
+        // MyStorageオブジェクトを生成
+        const objstorage = new MyStorage('JSSample');
+
         const lists = document.getElementById('list');
-        const storage = localStorage;
         const deleteStorage = document.getElementById('btnDel');
-        if(storage) {
-            for(let a = 0, len = storage.length; a < len; a++) {
-                // get key and value
-                let b = storage.key(a);
-                let c = storage[b];
+        if(objstorage.storage.length > 0) {
+            for(let a = 0, len = objstorage.storage.length; a <= len; a++) {
+
+                let b = objstorage.getItem(`Album Name ${a}`);
 
                 // 画像の構築
                 let items = document.createElement('img');
-                items.src = c;
+                items.src = b;
                 lists.appendChild(items);
                 console.log('キャッシュされたイメージを使いました！');
             }
@@ -62,7 +93,7 @@
         }
         // ローカルストレージ内のデータを全破棄
         deleteStorage.addEventListener('click', () => {
-            storage.clear();
+            objstorage.destroy();
             location.reload();
             console.log('全破棄しました。');
         });
@@ -79,8 +110,9 @@
                 reader.onload = (function(theFile) {
                     return (e) => {
                         // localStorageへのキャッシュ
-                        if(!storage[`${i}item`]) {
-                            storage[`${i}item`] = e.target.result;
+                        if(!objstorage.getItem(`Album Name ${i}`)) {
+                            objstorage.setItem(`Album Name ${i}`, e.target.result);
+                            objstorage.save();
                             console.log('キャッシュしました！');
                         }
 
